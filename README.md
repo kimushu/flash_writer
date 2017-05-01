@@ -31,6 +31,16 @@ NiosIIベースソフトウェア環境
 
 - peridot\_flash\_writer.spi
   - TODO
+  
+## 使用例
+
+- peridot\_flash\_writer.root.nameがデフォルト値"/sys/flash"であるとき、MAX10のUFM0にデータを書き込む例
+  ```c:prog_ufm0.c
+  unsigned char data[] = {...};
+  int fd = open("/sys/flash/ufm0", O_RDWR);
+  write(fd, data, sizeof(data));
+  close(fd);
+  ```
 
 ## MAX 10 内蔵フラッシュの扱い
 
