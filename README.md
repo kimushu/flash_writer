@@ -27,7 +27,7 @@ NiosIIベースソフトウェア環境
   - enabled
     - MAX 10 内蔵フラッシュの疑似ファイルを生成する場合にチェックします。
   - name
-    - altera\_onchip\_flash IPが登録するデバイスのパスを指定します。IPの名前を xxx とすると、通常は /dev/xxx\_csr です。
+    - altera\_onchip\_flash IPが登録するデバイスのパスを指定します。IPの名前を xxx とすると、通常は /dev/xxx\_data です。
 
 - peridot\_flash\_writer.spi
   - TODO
