@@ -1,5 +1,5 @@
 #include "system.h"
-#ifdef PERIDOT_FPGA_WRITER_OCF_ENABLED
+#ifdef PERIDOT_FLASH_WRITER_OCF_ENABLED
 
 #include "flash_file.h"
 #include "sys/alt_flash_dev.h"
@@ -290,4 +290,4 @@ found_end_region:
 	return alt_dev_reg(dev);
 }
 
-#endif  /* PERIDOT_FPGA_WRITER_OCF_ENABLED */
+#endif  /* PERIDOT_FLASH_WRITER_OCF_ENABLED */
