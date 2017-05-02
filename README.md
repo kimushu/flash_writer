@@ -50,9 +50,10 @@ MAX 10 内蔵フラッシュは、複数のUFMおよびCFMからなる5つのセ
 <table>
 <tr><th>セクタ番号</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr>
 <tr><td rowspan="2">疑似ファイル名</td><td align="center">ufm1</td><td align="center">ufm0</td><td align="center">cfm2</td><td align="center">cfm1</td><td align="center">cfm0</td></tr>
-<tr><td colspan="2" align="center">ufm (*)</td><td colspan="2" align="center">image2</td><td align="center">image1</td></tr>
+<tr><td colspan="2" align="center">ufm (*)</td><td colspan="2" align="center">image1</td><td align="center">image0</td></tr>
 </table>
 
 (*)…Single configurationの場合はセクタ3以降もUFMに含まれるケースがありますが、本パッケージでのufmは常にセクタ1～2のみを指します。
 
-なお、各セクタの役割やサイズについての詳細は、[メーカー資料](https://www.altera.com/en_US/pdfs/literature/hb/max-10/ug_m10_ufm.pdf)を参照してください。
+なお、各セクタの役割やサイズについての詳細は、メーカーの[UFM資料](https://www.altera.com/en_US/pdfs/literature/hb/max-10/ug_m10_ufm.pdf)および[コンフィグレーション資料](https://www.altera.com/en_US/pdfs/literature/hb/max-10/ug_m10_config.pdf)を参照してください。
+imageの名称はメーカー公式資料内でも統一されておらず混乱が見られるため、本IPではコンフィグレーション資料の呼称(image0/1)に統一しています。

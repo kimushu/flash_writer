@@ -7,10 +7,12 @@
 #include "altera_onchip_flash.h"
 
 /*
+References:
 https://www.altera.com/en_US/pdfs/literature/hb/max-10/ug_m10_ufm.pdf
+https://www.altera.com/en_US/pdfs/literature/hb/max-10/ug_m10_config.pdf
          ______________________________________
          |         Pages per sector           |________________________
-_________|     ufm     |   image2    | image1 | Page | Total size[kb] |
+_________|     ufm     |   image1    | image0 | Page | Total size[kb] |
 | Device | ufm1 | ufm0 | cfm2 | cfm1 |  cfm0  | [kb] |  UFM  |  CFM   |
 +--------+------+------+------+------+--------+------+-------+--------+
 | 10M02  |    3 |    3 |    0 |    0 |     34 |   16 |    96 |    544 |
@@ -113,7 +115,7 @@ int peridot_flash_writer_ocf_init(const char *dirname)
 	}
 
 	if (flash->sector3_enabled || flash->sector4_enabled) {
-		strcpy(name + dir_len, "/image2");
+		strcpy(name + dir_len, "/image1");
 		result = flash_file_reg(
 				&flash->dev, name,
 				flash->sector3_enabled ? flash->sector3_start_addr : flash->sector4_start_addr,
@@ -135,7 +137,7 @@ int peridot_flash_writer_ocf_init(const char *dirname)
 			return result;
 		}
 
-		strcpy(name + dir_len, "/image1");
+		strcpy(name + dir_len, "/image0");
 		result = flash_file_reg(
 				&flash->dev, name,
 				flash->sector5_start_addr,
