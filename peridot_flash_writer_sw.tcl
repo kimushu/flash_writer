@@ -7,6 +7,7 @@ create_sw_package peridot_flash_writer
 set_sw_property version 16.1
 set_sw_property auto_initialize true
 set_sw_property bsp_subdirectory services
+set_sw_property alt_sys_init_priority 1100
 
 #
 # Source file listings...
