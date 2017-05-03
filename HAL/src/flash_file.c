@@ -47,7 +47,7 @@ static int flash_file_drain(alt_fd *fd)
 
 	result = dev->flash->write(
 			dev->flash,
-			dev->start + (buf->offset & (buf->block_size - 1)),
+			dev->start + (buf->offset & ~(buf->block_size - 1)),
 			buf->data,
 			buf->block_size
 	);
@@ -142,7 +142,11 @@ static int flash_file_lseek(alt_fd *fd, int ptr, int dir)
 	}
 
 	if (((new_offset ^ buf->offset) & ~(buf->block_size - 1)) != 0) {
-		flash_file_drain(fd);
+		int result;
+		result = flash_file_drain(fd);
+		if (result < 0) {
+			return result;
+		}
 	}
 	buf->offset = new_offset;
 	return new_offset;
