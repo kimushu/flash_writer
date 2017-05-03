@@ -1,5 +1,5 @@
 #include "system.h"
-#if defined(PERIDOT_FLASH_WRITER_OCF_ENABLED) && defined(__ALTERA_ONCHIP_FLASH)
+#if defined(FLASH_WRITER_OCF_ENABLED) && defined(__ALTERA_ONCHIP_FLASH)
 
 #include <errno.h>
 #include <string.h>
@@ -37,14 +37,14 @@ ___________________________________________________________________
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-int peridot_flash_writer_ocf_init(const char *dirname)
+int flash_writer_ocf_init(const char *dirname)
 {
 	alt_onchip_flash_dev *flash;
 	int dir_len;
 	char *name;
 	int result;
 
-	flash = (alt_onchip_flash_dev *)alt_flash_open_dev(PERIDOT_FLASH_WRITER_OCF_NAME);
+	flash = (alt_onchip_flash_dev *)alt_flash_open_dev(FLASH_WRITER_OCF_NAME);
 	if (!flash) {
 		return -ENODEV;
 	}
@@ -145,4 +145,4 @@ int peridot_flash_writer_ocf_init(const char *dirname)
 	return 0;
 }
 
-#endif  /* PERIDOT_FLASH_WRITER_OCF_ENABLED && __ALTERA_ONCHIP_FLASH */
+#endif  /* FLASH_WRITER_OCF_ENABLED && __ALTERA_ONCHIP_FLASH */

@@ -1,4 +1,4 @@
-# peridot\_flash\_writer
+# flash\_writer
 
 このリポジトリは、NiosII HALシステム上に、フラッシュデバイスの読み書き機能を有する疑似ファイル(ブロックデバイス)を提供するパッケージです。
 以下のフラッシュデバイスに対応しています。
@@ -14,27 +14,27 @@ NiosIIベースソフトウェア環境
 ## 使い方
 
 - Quartusプロジェクトフォルダ直下の"ip"フォルダ内に、このリポジトリをクローンする。
-- NiosII EDS 上で BSP Editor を開き、Software Packages タブの一覧から「peridot\_flash\_writer」にチェックをつける
+- NiosII EDS 上で BSP Editor を開き、Software Packages タブの一覧から「_flash\_writer」にチェックをつける
 - 適宜設定を編集したのち、Generate BSP を実行する。
 
 ## 設定項目
 
-- peridot\_flash\_writer.root
+- flash\_writer.root
   - name
     - 疑似ファイルが作成されるパスを指定します。例えば /aaa/bbb を指定すると、疑似ファイル ccc のパスは /aaa/bbb/ccc となります。
 
-- peridot\_flash\_writer.on\_chip\_flash
+- flash\_writer.on\_chip\_flash
   - enabled
     - MAX 10 内蔵フラッシュの疑似ファイルを生成する場合にチェックします。
   - name
     - altera\_onchip\_flash IPが登録するデバイスのパスを指定します。IPの名前を xxx とすると、通常は /dev/xxx\_data です。
 
-- peridot\_flash\_writer.spi
+- flash\_writer.spi
   - TODO
   
 ## 使用例
 
-- peridot\_flash\_writer.root.nameがデフォルト値"/sys/flash"であるとき、MAX10のUFM0にデータを書き込む例
+- flash\_writer.root.nameがデフォルト値"/sys/flash"であるとき、MAX10のUFM0にデータを書き込む例
   ```c:prog_ufm0.c
   unsigned char data[] = {...};
   int fd = open("/sys/flash/ufm0", O_RDWR);
