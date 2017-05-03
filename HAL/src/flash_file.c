@@ -112,13 +112,51 @@ static int flash_file_close(alt_fd *fd)
 }
 
 /**
+ * lseek() for flash special file
+ */
+static int flash_file_lseek(alt_fd *fd, int ptr, int dir)
+{
+	flash_file_dev *dev = (flash_file_dev *)fd->dev;
+	flash_file_buf *buf = (flash_file_buf *)fd->priv;
+	int max_offset = (dev->end + 1 - dev->start);
+	int new_offset;
+
+	switch (dir) {
+		case SEEK_SET:
+			new_offset = ptr;
+			break;
+		case SEEK_CUR:
+			new_offset = buf->offset + ptr;
+			break;
+		case SEEK_END:
+			new_offset = max_offset + ptr;
+			break;
+		default:
+			return -EINVAL;
+	}
+
+	if (new_offset < 0) {
+		new_offset = 0;
+	} else if (new_offset > max_offset) {
+		new_offset = max_offset;
+	}
+
+	if (((new_offset ^ buf->offset) & ~(buf->block_size - 1)) != 0) {
+		flash_file_drain(fd);
+	}
+	buf->offset = new_offset;
+	return new_offset;
+}
+
+/**
  * read() for flash special file
  */
 static int flash_file_read(alt_fd *fd, char *ptr, int len)
 {
 	flash_file_dev *dev = (flash_file_dev *)fd->dev;
 	flash_file_buf *buf = (flash_file_buf *)fd->priv;
-	int max_len = (dev->end + 1) - (dev->start + buf->offset);
+	alt_u32 dev_offset = dev->start + buf->offset;
+	int max_len = (dev->end + 1) - dev_offset;
 	int result;
 	int new_offset;
 
@@ -126,23 +164,24 @@ static int flash_file_read(alt_fd *fd, char *ptr, int len)
 		len = max_len;
 	}
 
+	if (buf->flags & FLASH_FILE_WRONLY) {
+		return -EACCES;
+	}
+
 	if (len <= 0) {
 		return 0;
 	}
 
-	result = dev->flash->read(dev->flash, buf->offset, ptr, len);
+	result = dev->flash->read(dev->flash, dev_offset, ptr, len);
 	if (result < 0) {
 		return result;
 	}
 
-	new_offset = buf->offset + len;
-	if (((new_offset ^ buf->offset) & ~(buf->block_size - 1)) != 0) {
-		result = flash_file_drain(fd);
-		if (result < 0) {
-			return result;
-		}
+	result = flash_file_lseek(fd, len, SEEK_CUR);
+	if (result < 0) {
+		return result;
 	}
-	buf->offset = new_offset;
+
 	return len;
 }
 
@@ -183,43 +222,6 @@ static int flash_file_write(alt_fd *fd, const char *ptr, int len)
 	}
 
 	return written;
-}
-
-/**
- * lseek() for flash special file
- */
-static int flash_file_lseek(alt_fd *fd, int ptr, int dir)
-{
-	flash_file_dev *dev = (flash_file_dev *)fd->dev;
-	flash_file_buf *buf = (flash_file_buf *)fd->priv;
-	int max_offset = (dev->end + 1 - dev->start);
-	int new_offset;
-
-	switch (dir) {
-		case SEEK_SET:
-			new_offset = ptr;
-			break;
-		case SEEK_CUR:
-			new_offset = buf->offset + ptr;
-			break;
-		case SEEK_END:
-			new_offset = max_offset + ptr;
-			break;
-		default:
-			return -EINVAL;
-	}
-
-	if (new_offset < 0) {
-		new_offset = 0;
-	} else if (new_offset > max_offset) {
-		new_offset = max_offset;
-	}
-
-	if (((new_offset ^ buf->offset) & ~(buf->block_size - 1)) != 0) {
-		flash_file_drain(fd);
-	}
-	buf->offset = new_offset;
-	return new_offset;
 }
 
 /**
