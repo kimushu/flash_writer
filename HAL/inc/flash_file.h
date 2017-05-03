@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-extern int flash_file_reg(alt_flash_fd *flash, const char *name, alt_u32 start, alt_u32 end, int readonly);
+extern int flash_file_reg(alt_flash_fd *flash, const char *name, alt_u32 start, alt_u32 end);
 
 #ifdef __cplusplus
 }	/* extern "C" */

@@ -10,6 +10,11 @@
 #include <string.h>
 #include <unistd.h>
 
+enum {
+	FLASH_FILE_WRONLY = (1<<0),
+	FLASH_FILE_DIRTY  = (1<<1),
+};
+
 typedef struct {
 	alt_dev dev;
 	alt_flash_fd *flash;
@@ -22,7 +27,7 @@ typedef struct {
 
 typedef struct {
 	int offset;
-	int dirty;
+	int flags;
 	int block_size;
 	alt_u8 data[0];
 } flash_file_buf;
@@ -36,7 +41,7 @@ static int flash_file_drain(alt_fd *fd)
 	flash_file_buf *buf = (flash_file_buf *)fd->priv;
 	int result;
 
-	if (!buf->dirty) {
+	if ((buf->flags & FLASH_FILE_DIRTY) == 0) {
 		return 0;
 	}
 
@@ -49,7 +54,7 @@ static int flash_file_drain(alt_fd *fd)
 	if (result < 0) {
 		return result;
 	}
-	buf->dirty = 0;
+	buf->flags &= ~FLASH_FILE_DIRTY;
 	return 0;
 }
 
@@ -61,6 +66,7 @@ static int flash_file_open(alt_fd *fd, const char *name, int flags, int mode)
 	flash_file_buf *buf;
 	flash_file_dev *dev = (flash_file_dev *)fd->dev;
 	int block_size = 0;
+	int write_only = 0;
 
 	if (((flags & O_ACCMODE) + 1) & _FWRITE) {
 		// Write mode
@@ -68,6 +74,10 @@ static int flash_file_open(alt_fd *fd, const char *name, int flags, int mode)
 			return -EACCES;
 		}
 		block_size = dev->flash->region_info[dev->start_region].block_size;
+		if (!(((flags & O_ACCMODE) + 1) & _FREAD)) {
+			// Write only
+			write_only = 1;
+		}
 	}
 	if (flags & O_EXCL) {
 		// Cannot opened for exclusive creation
@@ -79,7 +89,7 @@ static int flash_file_open(alt_fd *fd, const char *name, int flags, int mode)
 		return -ENOMEM;
 	}
 	buf->offset = 0;
-	buf->dirty = 0;
+	buf->flags = (write_only ? FLASH_FILE_WRONLY : 0);
 	buf->block_size = block_size;
 	if (block_size > 0) {
 		memset(buf->data, 0xff, block_size);
@@ -161,7 +171,7 @@ static int flash_file_write(alt_fd *fd, const char *ptr, int len)
 		ptr += page_len;
 		len -= page_len;
 		buf->offset += page_len;
-		buf->dirty = 1;
+		buf->flags |= FLASH_FILE_DIRTY;
 		written += page_len;
 
 		if ((buf->offset & (buf->block_size - 1)) == 0) {
@@ -230,7 +240,7 @@ static int flash_file_fstat(alt_fd *fd, struct stat *stbuf)
 /**
  * Register special file (block device) for flash device
  */
-int flash_file_reg(alt_flash_fd *flash, const char *name, alt_u32 start, alt_u32 end, int readonly)
+int flash_file_reg(alt_flash_fd *flash, const char *name, alt_u32 start, alt_u32 end)
 {
 	flash_file_dev *dev;
 	int region, start_region;
@@ -238,14 +248,17 @@ int flash_file_reg(alt_flash_fd *flash, const char *name, alt_u32 start, alt_u32
 
 	for (region = 0; region < flash->number_of_regions; ++region) {
 		flash_region *region_info = &flash->region_info[region];
-		if (region_info->offset <= start) {
+		if ((region_info->offset <= start) &&
+			(start < (region_info->offset + region_info->region_size))) {
 			block_size = region_info->block_size;
 			start_region = region;
 			goto found_start_region;
 		}
 	}
 	// Start address exceeds flash device range
-	return -EINVAL;
+	// => Create device as read-only
+	block_size = 0;
+	goto create_device;
 
 found_start_region:
 	for (; region < flash->number_of_regions; ++region) {
@@ -258,7 +271,9 @@ found_start_region:
 		}
 	}
 	// End address exceeds flash device range
-	return -EINVAL;
+	// => Create device as read-only
+	block_size = 0;
+	goto create_device;
 
 found_end_region:
 	if ((start & (block_size - 1)) != 0 ||
@@ -267,6 +282,7 @@ found_end_region:
 		return -EINVAL;
 	}
 
+create_device:
 	dev = (flash_file_dev *)malloc(sizeof(*dev) + strlen(name) + 1);
 	if (!dev) {
 		return -ENOMEM;
@@ -284,9 +300,9 @@ found_end_region:
 	dev->flash = flash;
 	dev->start = start;
 	dev->end = end;
-	dev->start_region = start_region;
-	dev->end_region = region;
-	dev->readonly = readonly;
+	dev->start_region = (block_size > 0 ? start_region : -1);
+	dev->end_region = (block_size > 0 ? region : -1);
+	dev->readonly = (block_size == 0);
 	return alt_dev_reg(dev);
 }
 
