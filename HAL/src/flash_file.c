@@ -198,6 +198,7 @@ static int flash_file_write(alt_fd *fd, const char *ptr, int len)
 	while (len > 0) {
 		int page_offset = buf->offset & (buf->block_size - 1);
 		int page_len = buf->block_size - page_offset;
+		int result;
 
 		if (buf->offset >= max_offset) {
 			break;
@@ -209,15 +210,12 @@ static int flash_file_write(alt_fd *fd, const char *ptr, int len)
 		memcpy(buf->data + page_offset, ptr, page_len);
 		ptr += page_len;
 		len -= page_len;
-		buf->offset += page_len;
 		buf->flags |= FLASH_FILE_DIRTY;
 		written += page_len;
 
-		if ((buf->offset & (buf->block_size - 1)) == 0) {
-			int result = flash_file_drain(fd);
-			if (result < 0) {
-				return result;
-			}
+		result = flash_file_lseek(fd, page_len, SEEK_CUR);
+		if (result < 0) {
+			return result;
 		}
 	}
 
