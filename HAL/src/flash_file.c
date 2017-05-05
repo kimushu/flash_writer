@@ -162,7 +162,6 @@ static int flash_file_read(alt_fd *fd, char *ptr, int len)
 	alt_u32 dev_offset = dev->start + buf->offset;
 	int max_len = (dev->end + 1) - dev_offset;
 	int result;
-	int new_offset;
 
 	if (len > max_len) {
 		len = max_len;
@@ -312,7 +311,7 @@ create_device:
 	dev->start_region = (block_size > 0 ? start_region : -1);
 	dev->end_region = (block_size > 0 ? region : -1);
 	dev->readonly = (block_size == 0);
-	return alt_dev_reg(dev);
+	return alt_dev_reg(&dev->dev);
 }
 
 #endif  /* FLASH_WRITER_OCF_ENABLED */
