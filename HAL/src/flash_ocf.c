@@ -61,7 +61,8 @@ int flash_writer_ocf_init(const char *dirname)
 		result = flash_file_reg(
 				&flash->dev, name,
 				flash->sector1_start_addr,
-				flash->sector1_end_addr);
+				flash->sector1_end_addr,
+				FLASH_WRITER_OCF_READ_ONLY);
 		if (result < 0) {
 			return result;
 		}
@@ -72,7 +73,8 @@ int flash_writer_ocf_init(const char *dirname)
 		result = flash_file_reg(
 				&flash->dev, name,
 				flash->sector2_start_addr,
-				flash->sector2_end_addr);
+				flash->sector2_end_addr,
+				FLASH_WRITER_OCF_READ_ONLY);
 		if (result < 0) {
 			return result;
 		}
@@ -83,7 +85,8 @@ int flash_writer_ocf_init(const char *dirname)
 		result = flash_file_reg(
 				&flash->dev, name,
 				flash->sector1_enabled ? flash->sector1_start_addr : flash->sector2_start_addr,
-				flash->sector2_enabled ? flash->sector2_end_addr : flash->sector1_end_addr);
+				flash->sector2_enabled ? flash->sector2_end_addr : flash->sector1_end_addr,
+				FLASH_WRITER_OCF_READ_ONLY);
 		if (result < 0) {
 			return result;
 		}
@@ -94,7 +97,8 @@ int flash_writer_ocf_init(const char *dirname)
 		result = flash_file_reg(
 				&flash->dev, name,
 				flash->sector3_start_addr,
-				flash->sector3_end_addr);
+				flash->sector3_end_addr,
+				FLASH_WRITER_OCF_READ_ONLY);
 		if (result < 0) {
 			return result;
 		}
@@ -105,7 +109,8 @@ int flash_writer_ocf_init(const char *dirname)
 		result = flash_file_reg(
 				&flash->dev, name,
 				flash->sector4_start_addr,
-				flash->sector4_end_addr);
+				flash->sector4_end_addr,
+				FLASH_WRITER_OCF_READ_ONLY);
 		if (result < 0) {
 			return result;
 		}
@@ -116,7 +121,8 @@ int flash_writer_ocf_init(const char *dirname)
 		result = flash_file_reg(
 				&flash->dev, name,
 				flash->sector3_enabled ? flash->sector3_start_addr : flash->sector4_start_addr,
-				flash->sector4_enabled ? flash->sector4_end_addr : flash->sector3_end_addr);
+				flash->sector4_enabled ? flash->sector4_end_addr : flash->sector3_end_addr,
+				FLASH_WRITER_OCF_READ_ONLY);
 		if (result < 0) {
 			return result;
 		}
@@ -127,7 +133,8 @@ int flash_writer_ocf_init(const char *dirname)
 		result = flash_file_reg(
 				&flash->dev, name,
 				flash->sector5_start_addr,
-				flash->sector5_end_addr);
+				flash->sector5_end_addr,
+				FLASH_WRITER_OCF_READ_ONLY);
 		if (result < 0) {
 			return result;
 		}
@@ -136,7 +143,8 @@ int flash_writer_ocf_init(const char *dirname)
 		result = flash_file_reg(
 				&flash->dev, name,
 				flash->sector5_start_addr,
-				flash->sector5_end_addr);
+				flash->sector5_end_addr,
+				FLASH_WRITER_OCF_READ_ONLY);
 		if (result < 0) {
 			return result;
 		}

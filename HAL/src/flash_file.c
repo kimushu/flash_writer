@@ -244,11 +244,16 @@ static int flash_file_fstat(alt_fd *fd, struct stat *stbuf)
 /**
  * Register special file (block device) for flash device
  */
-int flash_file_reg(alt_flash_fd *flash, const char *name, alt_u32 start, alt_u32 end)
+int flash_file_reg(alt_flash_fd *flash, const char *name, alt_u32 start, alt_u32 end, int read_only)
 {
 	flash_file_dev *dev;
 	int region, start_region;
 	int block_size;
+
+	if (read_only) {
+		block_size = 0;
+		goto create_device;
+	}
 
 	for (region = 0; region < flash->number_of_regions; ++region) {
 		flash_region *region_info = &flash->region_info[region];

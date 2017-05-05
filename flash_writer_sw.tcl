@@ -29,5 +29,6 @@ add_sw_property supported_bsp_type HAL
 add_sw_setting quoted_string system_h_define root.name FLASH_WRITER_ROOT_NAME "/sys/flash" "Root name of flash writer"
 add_sw_setting boolean_define_only system_h_define on_chip_flash.enabled FLASH_WRITER_OCF_ENABLED 0 "Enable altera_onchip_flash for MAX 10 devices"
 add_sw_setting quoted_string system_h_define on_chip_flash.name FLASH_WRITER_OCF_NAME "/dev/altera_onchip_flash_data" "Device name of altera_onchip_flash CSR"
+add_sw_setting boolean system_h_define on_chip_flash.read_only FLASH_WRITER_OCF_READ_ONLY 0 "Set read-only mode for altera_onchip_flash"
 
 # End of file
