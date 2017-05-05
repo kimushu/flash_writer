@@ -30,7 +30,7 @@ int flash_writer_spi_init(const char *dirname)
 	strcpy(name + dir_len, "/spi");
 
 	return flash_file_reg(
-			flash, name, 0, flash->length,
+			flash, name, 0, flash->length - 1,
 			FLASH_WRITER_SPI_READ_ONLY);
 }
 
