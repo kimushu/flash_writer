@@ -1,6 +1,3 @@
-#include "system.h"
-#ifdef FLASH_WRITER_OCF_ENABLED
-
 #include "flash_file.h"
 #include "sys/alt_flash_dev.h"
 #include "sys/alt_dev.h"
@@ -314,4 +311,3 @@ create_device:
 	return alt_dev_reg(&dev->dev);
 }
 
-#endif  /* FLASH_WRITER_OCF_ENABLED */
