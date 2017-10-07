@@ -62,7 +62,7 @@ static int flash_file_open(alt_fd *fd, const char *name, int flags, int mode)
 {
 	flash_file_buf *buf;
 	flash_file_dev *dev = (flash_file_dev *)fd->dev;
-	int block_size = 0;
+	int block_size;
 	int write_only = 0;
 
 	if (((flags & O_ACCMODE) + 1) & _FWRITE) {
@@ -70,7 +70,6 @@ static int flash_file_open(alt_fd *fd, const char *name, int flags, int mode)
 		if (dev->readonly) {
 			return -EACCES;
 		}
-		block_size = dev->flash->region_info[dev->start_region].block_size;
 		if (!(((flags & O_ACCMODE) + 1) & _FREAD)) {
 			// Write only
 			write_only = 1;
@@ -81,14 +80,19 @@ static int flash_file_open(alt_fd *fd, const char *name, int flags, int mode)
 		return -EACCES;
 	}
 
-	buf = (flash_file_buf *)malloc(sizeof(*buf) + block_size);
+	if (dev->start_region >= 0) {
+		block_size = dev->flash->region_info[dev->start_region].block_size;
+	} else {
+		block_size = 1;
+	}
+	buf = (flash_file_buf *)malloc(sizeof(*buf) + ((((flags & O_ACCMODE) + 1) & _FWRITE) ? block_size : 0));
 	if (!buf) {
 		return -ENOMEM;
 	}
 	buf->offset = 0;
 	buf->flags = (write_only ? FLASH_FILE_WRONLY : 0);
 	buf->block_size = block_size;
-	if (block_size > 0) {
+	if (((flags & O_ACCMODE) + 1) & _FWRITE) {
 		memset(buf->data, 0xff, block_size);
 	}
 	fd->priv = (alt_u8 *)buf;
